@@ -1,9 +1,9 @@
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        args = new String[2];
-        args[0] = "-r";
-        args[1] = "/Users/lynn/lab/ant";
+//        args = new String[2];
+//        args[0] = "-r";
+//        args[1] = "/Users/lynn/lab/ant";
         if(args.length < 1){
             throw new IllegalArgumentException("Type 'RefactorRec -h' to show usage");
         }

@@ -23,3 +23,9 @@ dependencies {
     compile files("${project.projectDir}/lib/jxplatform-1.0-all.jar")
     compile files("${project.projectDir}/lib/jxmetrics-1.0-all.jar")
 }
+
+apply plugin: 'application'
+mainClassName = 'Main'
+distZip {
+    baseName = 'RefactorRec'
+}
