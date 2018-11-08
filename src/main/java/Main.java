@@ -1,9 +1,10 @@
+import java.io.File;
 
 public class Main {
     public static void main(String[] args) throws Exception {
 //        args = new String[2];
-//        args[0] = "-r";
-//        args[1] = "/Users/lynn/lab/ant";
+//        args[0] = "-p";
+//        args[1] = "/Users/lynn/java-exp/ant/ant";
         if(args.length < 1){
             throw new IllegalArgumentException("Type 'RefactorRec -h' to show usage");
         }
@@ -15,6 +16,8 @@ public class Main {
             fromGetRefactor(args[1]);
         } else if(option.equalsIgnoreCase("-m")){
             fromGetMetrics(args[1]);
+        } else if(option.equalsIgnoreCase("-p")){
+            parse.parseXML(new File(args[1]));
         } else {
             printTips();
         }
@@ -22,18 +25,21 @@ public class Main {
 
     private static void fromGetRefactor(String arg) throws Exception {
         System.out.println("start with Refactoring detection.");
-        getData.getRefData(arg);
-        getData.getMetrics(arg);
+        getData.getRefData(new File(arg));
+        getData.getMetrics(new File(arg));
+        parse.parseXML(new File(arg));
     }
 
     private static void fromGetMetrics(String arg) throws Exception {
         System.out.println("start with metrics collection.");
-        getData.getMetrics(arg);
+        getData.getMetrics(new File(arg));
+        parse.parseXML(new File(arg));
     }
 
     private static void printTips(){
         System.out.println("-h\t\t\tShow tips");
         System.out.println("-r <full path of target directory>\twhen there is no file in which Refactoring has been detected.");
         System.out.println("-m <full path of target directory>\twhen you already have a file of detected Refactoring");
+        System.out.println("-p <full path of target directory>\twhen you already have a file of metrics(.xml)");
     }
 }
