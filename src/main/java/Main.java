@@ -17,7 +17,7 @@ public class Main {
         } else if(option.equalsIgnoreCase("-m")){
             fromGetMetrics(args[1]);
         } else if(option.equalsIgnoreCase("-p")){
-            parse.parseXML(new File(args[1]));
+            parseXML.parseXML(new File(args[1]));
         } else {
             printTips();
         }
@@ -27,13 +27,13 @@ public class Main {
         System.out.println("start with Refactoring detection.");
         getData.getRefData(new File(arg));
         getData.getMetrics(new File(arg));
-        parse.parseXML(new File(arg));
+        parseXML.parseXML(new File(arg));
     }
 
     private static void fromGetMetrics(String arg) throws Exception {
         System.out.println("start with metrics collection.");
         getData.getMetrics(new File(arg));
-        parse.parseXML(new File(arg));
+        parseXML.parseXML(new File(arg));
     }
 
     private static void printTips(){
