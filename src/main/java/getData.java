@@ -21,24 +21,12 @@ public class getData {
     public static void getMetrics(File folder) throws Exception {
         java.lang.String line;
         java.lang.String prev = "CommitId";
-        java.lang.String[] data;
 
-        Repository repo; //jgit
-        Git git;
-        RevCommit parent;
-        RevWalk walk;
-
-        MetricsCalculator calculator; //jxMetrics
-
+        // for reading the file output by Refactoring Miner
         java.lang.String parentPath = folder.getParent();
         File allRef = new File(parentPath + "/all_refactorings.csv");
         BufferedReader br = new BufferedReader(new FileReader(allRef));
-
-        File metricDir; //move metrics file
-        File[] files;
-        java.lang.String fileName;
-        File srcFile;
-        File destFile;
+        //************
 
         File dataDir = new File(parentPath + "/" + folder.getName() + "_data/xml/");
         if(!dataDir.exists()){
@@ -46,31 +34,38 @@ public class getData {
         }
 
         while((line = br.readLine()) != null){
-            data = line.split("#", 0);
+            java.lang.String[] data = line.split("#", 0);
 
             if(!prev.equals(data[0]) && data[0].length() == 40) {
                 prev = data[0];
 
+                // git reset
                 System.out.println("\ngit reset --hard " + data[0]);
-                repo = new FileRepository((java.lang.String.valueOf(folder + "/.git")));
-                git = new Git(repo);
-                walk = new RevWalk(repo);
-                parent = walk.parseCommit(ObjectId.fromString(data[0])).getParent(0);
+                Repository repo = new FileRepository((java.lang.String.valueOf(folder + "/.git")));
+                Git git = new Git(repo);
+                RevWalk walk = new RevWalk(repo);
+                RevCommit parent = walk.parseCommit(ObjectId.fromString(data[0])).getParent(0);
                 git.reset().setMode( ResetCommand.ResetType.HARD ).setRef(parent.getName()).call();
+                //*****
 
+                // run jxMetrics
                 System.out.println("\ncalculate the Metrics of " + data[0]);
-                calculator = new MetricsCalculator("RefactoringMetrics", folder.getPath());
+                MetricsCalculator calculator = new MetricsCalculator("RefactoringMetrics", folder.getPath());
                 calculator.run();
+                //*****
 
-                files = folder.listFiles();
+                // move the output file by jxMetrics to directory where xml is stored
+                File[] files = folder.listFiles();
                 for(int i = 0; i < files.length; i++){
-                    fileName = files[i].getName();
+                    java.lang.String fileName = files[i].getName();
                     if(fileName.startsWith("RefactoringMetrics")){
-                        srcFile = new File(folder + "/" + fileName);
-                        destFile = new File(dataDir.getPath() + "/" + data[0] + ".xml");
+                        File srcFile = new File(folder + "/" + fileName);
+                        File destFile = new File(dataDir.getPath() + "/" + data[0] + ".xml");
                         srcFile.renameTo(destFile);
                     }
                 }
+                //*****
+
                 repo.close(); //will be GC, isn't this necessary?
             }
         }
