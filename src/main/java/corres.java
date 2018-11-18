@@ -29,6 +29,8 @@ public class corres {
             if (!dataDir.exists()) {
                 throw new Exception();
             }
+            FileWriter f = new FileWriter(parentPath + "/" + folder.getName() + "/" + type + ".csv");
+            PrintWriter p = new PrintWriter(new BufferedWriter(f));
 
             while ((line = br.readLine()) != null) {
                 data = line.split("#", 0);
