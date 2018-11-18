@@ -1,7 +1,9 @@
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 
 public class Main {
-    public static void main(String[] args) throws Exception {
+    public static void main(@NotNull String[] args) throws Exception {
 //        args = new String[2];
 //        args[0] = "-p";
 //        args[1] = "/Users/lynn/java-exp/ant/ant";
