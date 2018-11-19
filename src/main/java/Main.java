@@ -42,8 +42,9 @@ public class Main {
 
     private static void printTips(){
         System.out.println("-h\t\t\tShow tips");
-        System.out.println("-r <full path of target directory>\twhen there is no file in which Refactoring has been detected.");
-        System.out.println("-m <full path of target directory>\twhen you already have a file of detected Refactoring");
-        System.out.println("-p <full path of target directory>\twhen you already have a file of metrics(.xml)");
+        System.out.println("-r <full path of target directory>\tRefactoring detection, when there is no file in which Refactoring has been detected.");
+        System.out.println("-m <full path of target directory>\tMetrics calculator, when you already have a file of detected Refactoring");
+        System.out.println("-p <full path of target directory>\tparseXML, when you already have a file of metrics(.xml)");
+        System.out.println("-c <full path of target directory>\tcorresponsive, when you already have a file of metrics(.csv)");
     }
 }
