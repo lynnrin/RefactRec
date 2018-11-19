@@ -1,12 +1,11 @@
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
 public class Main {
-    public static void main(@NotNull String[] args) throws Exception {
-//        args = new String[2];
-//        args[0] = "-p";
-//        args[1] = "/Users/lynn/java-exp/ant/ant";
+    public static void main(String[] args) throws Exception {
+        args = new String[2];
+        args[0] = "-c";
+        args[1] = "/Users/lynn/java-exp/ant/ant";
         if(args.length < 1){
             throw new IllegalArgumentException("Type 'RefactorRec -h' to show usage");
         }
@@ -14,12 +13,15 @@ public class Main {
         if (option.equalsIgnoreCase("-h") || option.equalsIgnoreCase("--h")
                 || option.equalsIgnoreCase("-help") || option.equalsIgnoreCase("--help")) {
             printTips();
-        }else if(option.equalsIgnoreCase("-r")){
+        } else if(option.equalsIgnoreCase("-r")){
             fromGetRefactor(args[1]);
         } else if(option.equalsIgnoreCase("-m")){
             fromGetMetrics(args[1]);
         } else if(option.equalsIgnoreCase("-p")){
             parseXML.parseXML(new File(args[1]));
+        } else if (option.equalsIgnoreCase("-c")){
+            corresponsive cor = new corresponsive();
+            cor.corresponsive(new File(args[1]));
         } else {
             printTips();
         }

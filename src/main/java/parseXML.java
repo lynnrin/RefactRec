@@ -1,4 +1,3 @@
-import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -9,19 +8,18 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.util.Arrays;
+import java.util.Iterator;
 
 class parseXML {
-    public static void parseXML(@NotNull File folder) throws IOException, SAXException, ParserConfigurationException {
-        java.lang.String parentPath = folder.getParent();
+    public static void parseXML(File folder) throws IOException, SAXException, ParserConfigurationException {
+        String parentPath = folder.getParent();
 
         parameter pm = new parameter();
         String separate = pm.getSeparater();
-        String[] methodTypeList = pm.getTypeList();
-
-        String[] methodMetricsList = pm.getMethodMetricsList();
-
-        String[] classMetricsList = pm.getClassMetricsList();
-
+        String methodTypeList[] = pm.getTypeList();
+        String methodMetricsList[] = pm.getMethodMetricsList();
+        String classMetricsList[] = pm.getClassMetricsList();
 
         File xmlDir = new File(parentPath + "/" + folder.getName() + "_data/xml/");
         File csvDir = new File(xmlDir.getParent() +  "/csv/");
@@ -31,6 +29,7 @@ class parseXML {
         if(!csvDir.exists()){
             csvDir.mkdir();
         }
+
         File[] files = xmlDir.listFiles();
         for(File file: files){
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -56,6 +55,7 @@ class parseXML {
                         p.print(separate);
                     }
                 }
+                p.println();
                 //************
 
                 Element root = document.getDocumentElement();
@@ -85,8 +85,8 @@ class parseXML {
 
                                 if (classChild.getNodeName().equals("metrics")){
                                     StringBuilder classBuf = new StringBuilder();
-                                    for (int m = 0; i < classMetricsList.length; i++){
-                                        classBuf.append(classChild.getAttributes().getNamedItem(classMetricsList[m]).getNodeValue());
+                                    for (String s : classMetricsList){
+                                        classBuf.append(classChild.getAttributes().getNamedItem(s).getNodeValue());
                                         classBuf.append(separate);
                                     }
                                     classMetrics = classBuf.toString();
@@ -109,9 +109,11 @@ class parseXML {
                                     while (methodChild != null){
                                         if (methodChild.getNodeName().equals("metrics")){
                                             buf.append(classMetrics);
-                                            for (int m = 0; i < methodMetricsList.length; i++){
-                                                buf.append(methodChild.getAttributes().getNamedItem(methodMetricsList[m]).getNodeValue());
-                                                buf.append(separate);
+                                            for (Iterator<String> iter = Arrays.asList(methodMetricsList).iterator(); iter.hasNext();){
+                                                buf.append(methodChild.getAttributes().getNamedItem(iter.next()).getNodeValue());
+                                                if (iter.hasNext()){
+                                                    buf.append(separate);
+                                                }
                                             }
                                             buf.append(System.getProperty("line.separator"));
                                             p.print(buf.toString());
