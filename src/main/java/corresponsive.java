@@ -1,5 +1,3 @@
-import sun.jvm.hotspot.StackTrace;
-
 import java.io.*;
 import java.util.InputMismatchException;
 import java.util.Scanner;
