@@ -4,8 +4,8 @@ import java.util.Scanner;
 
 public class corresponsive {
     public void corresponsive(File folder) throws IOException {
-        Scanner scanner = new Scanner(System.in);
         int x = 0;
+        Scanner scanner = new Scanner(System.in);
         parameter pm = new parameter();
         String[] refactoringType = pm.getRefactoringTypeList();
         do {
@@ -18,13 +18,23 @@ public class corresponsive {
             } catch (InputMismatchException e) {
                 System.err.println("invalid input value");
             }
-        }while (!(x >= 0 && x <= refactoringType.length));
+        }while (!(x >= 0 && x < refactoringType.length));
 
-        switch (x){
-            case 0:
+        corresponsive(folder, x);
+    }
+
+    public void corresponsive(File folder, int x) throws IOException {
+        parameter pm = new parameter();
+        String[] refactoringType = pm.getRefactoringTypeList();
+
+        switch (refactoringType[x]){
+            case "Extract Method":
                 corresMethod(folder, "Extract Method");
-//                corresMethod(folder, "Extract And Move Method");
+                corresMethod(folder, "Extract And Move Method");
                 break;
+            case "Move Method":
+                corresMethod(folder, "Move Method");
+                corresMethod(folder, "Extract And Move Method");
             default:
                 corresMethod(folder, "Extract Method");
         }
@@ -40,7 +50,7 @@ public class corresponsive {
         return count;
     }
 
-    public void corresMethod(File folder, String type) throws IOException {
+    private void corresMethod(File folder, String type) {
         java.lang.String line;
         java.lang.String csvLine;
         java.lang.String parentPath = folder.getParent();
