@@ -3,9 +3,10 @@ import java.io.File;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-//        args = new String[2];
-//        args[0] = "-c";
+//        args = new String[3];
+//        args[0] = "-w";
 //        args[1] = "/Users/lynn/java-exp/ant/ant";
+//        args[2] = "0";
         if(args.length < 1){
             throw new IllegalArgumentException("Type 'RefactorRec -h' to show usage");
         }
@@ -21,6 +22,8 @@ public class Main {
             fromParseXML(args);
         } else if (option.equalsIgnoreCase("-c")){
             fromCorresponsive(args);
+        } else if (option.equalsIgnoreCase("-w")){
+            fromWeka(args);
         } else {
             printTips();
         }
@@ -49,8 +52,15 @@ public class Main {
         corresponsive cor = new corresponsive();
         if (args.length == 3) {
             cor.corresponsive(new File(args[1]), Integer.parseInt(args[2]));
+        } else {
+            cor.corresponsive(new File(args[1]));
         }
-        cor.corresponsive(new File(args[1]));
+    }
+
+    private static void fromWeka(String[] args) throws Exception {
+        System.out.println("start with weka.");
+        weka weka = new weka();
+        weka.weka(new File(args[1]));
     }
 
     private static void printTips(){
@@ -59,5 +69,6 @@ public class Main {
         System.out.println("-m <full path of target directory>\tMetrics calculator, when you already have a file of detected Refactoring");
         System.out.println("-p <full path of target directory>\tparseXML, when you already have a file of metrics(.xml)");
         System.out.println("-c <full path of target directory>\tcorresponsive, when you already have a file of metrics(.csv)");
+        System.out.println("-w <full path of target directory>\tmachine learning");
     }
 }

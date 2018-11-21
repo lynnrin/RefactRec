@@ -55,11 +55,15 @@ public class corresponsive {
         java.lang.String csvLine;
         java.lang.String parentPath = folder.getParent();
 
+        int pass = 4;
         // get parameters
         parameter pm = new parameter();
         pm.makeList();
         String[] metricsList = pm.getMetricsList();
+        String[] methodMetricsList = pm.getMethodMetricsList();
+        String[] classMetricsList = pm.getClassMetricsList();
         String separate = pm.getSeparater();
+        String sepOutput = ",";
         //***
 
         try {
@@ -71,11 +75,16 @@ public class corresponsive {
             // define csv file for each type & output csv header
             FileWriter f = new FileWriter(parentPath + "/" + folder.getName() + "_" + type.replace(" ", "_") + ".csv");
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
-            p.print("CommitId");
-            p.print(separate);
-            for (int i = 2; i < metricsList.length; i++){
-                p.print(metricsList[i]);
-                p.print(separate);
+//            p.print("CommitId");
+//            p.print(sepOutput);
+            for (String s : classMetricsList) {
+                p.print("class");
+                p.print(s);
+                p.print(sepOutput);
+            }
+            for (String s : methodMetricsList) {
+                p.print(s);
+                p.print(sepOutput);
             }
             p.println("label");
             ////*********
@@ -103,14 +112,13 @@ public class corresponsive {
                             int dataCount = count(csvData[2], ',');
 
                             // in any case, data required
-                            p.print(data[0]); //output Commit ID
-                            p.print(separate);
-                            for (int m = metricsList.length-2; m > 0; m--){
+//                            p.print(data[0]); //output Commit ID
+//                            p.print(sepOutput);
+                            for (int m = metricsList.length-pass; m > 0; m--){
                                 p.print(csvData[csvData.length - m]);
-                                p.print(separate);
+                                p.print(sepOutput);
                             }
                             if (methodName.equals(csvData[2].substring(0, csvData[2].indexOf("("))) && refCount == dataCount){
-                                System.out.println(data[0]);
                                 p.print("1"); // if it is target, output 1
                             } else {
                                 p.print("0");
@@ -120,11 +128,11 @@ public class corresponsive {
 
                         } else if (data[2].lastIndexOf(".") != -1 ? data[2].substring(0, data[2].lastIndexOf(".")).equals(csvData[0])
                                 : data[2].equals(csvData[0])){ //exist in the same package
-                            p.print(data[0]); //output Commit ID
-                            p.print(separate);
-                            for (int m = metricsList.length-2; m > 0; m--){
+//                            p.print(data[0]); //output Commit ID
+//                            p.print(sepOutput);
+                            for (int m = metricsList.length-pass; m > 0; m--){
                                 p.print(csvData[csvData.length - m]);
-                                p.print(separate);
+                                p.print(sepOutput);
                             }
                             p.print("0");
                             p.println();
