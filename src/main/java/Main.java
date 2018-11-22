@@ -3,10 +3,10 @@ import java.io.File;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-//        args = new String[3];
-//        args[0] = "-w";
+//        args = new String[2];
+//        args[0] = "-c";
 //        args[1] = "/Users/lynn/java-exp/ant/ant";
-//        args[2] = "0";
+//        args[2] = "1";
         if(args.length < 1){
             throw new IllegalArgumentException("Type 'RefactorRec -h' to show usage");
         }
@@ -55,6 +55,7 @@ public class Main {
         } else {
             cor.corresponsive(new File(args[1]));
         }
+        fromWeka(args);
     }
 
     private static void fromWeka(String[] args) throws Exception {
