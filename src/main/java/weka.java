@@ -1,22 +1,50 @@
-import weka.classifiers.Evaluation;
-import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 import weka.core.converters.CSVLoader;
 
 import java.io.File;
-import java.io.FileReader;
-import java.util.Random;
 
 public class weka {
     public static void weka(File folder) throws Exception {
         java.lang.String parentPath = folder.getParent();
-        File targetFolder = new File(parentPath + "/" + "ant_Extract_Method.csv");
-        File arffFile = csv2arff(targetFolder);
-        randomForest(arffFile);
+        File dir = new File(parentPath);
+        File[] files = dir.listFiles();
+        parameter pm = new parameter();
+        String[] refactoringType = pm.getRefactoringTypeList();
+        int sel =  select.selection();
+        String targetFile;
+        switch (refactoringType[sel]){
+            case "Extract Method":
+                targetFile = searchTargetFile(files, "Extract");
+                break;
+            case "Move Method":
+                targetFile = searchTargetFile(files, "Move");
+                break;
+            case "Inline Method":
+                targetFile = searchTargetFile(files, "Inline");
+                break;
+            default:
+                targetFile = searchTargetFile(files, "Extract");
+        }
+        try {
+            File targetFolder = new File(targetFile);
+
+            File arffFile = csv2arff(targetFolder, new File(targetFile));
+        } catch (Exception e) {
+            System.err.println("don't find target file");
+        }
     }
 
-    private static File csv2arff(File folder) throws Exception {
+    private static String searchTargetFile(File[] files, String target){
+        for (File file : files) {
+            if (file.getName().matches(".*" + target + ".*" + ".csv")) {
+                return file.getPath();
+            }
+        }
+        return null;
+    }
+
+    private static File csv2arff(File folder, File target) throws Exception {
         // load CSV
         CSVLoader loader = new CSVLoader();
         loader.setSource(folder);
@@ -24,30 +52,10 @@ public class weka {
         // save ARFF
         ArffSaver saver = new ArffSaver();
         saver.setInstances(data);
-        File arffFile = new File(folder.getParent() + "/test.arff");
+        File arffFile = new File(target.getPath().replaceFirst("\\.csv", "\\.arff"));
         saver.setFile(arffFile);
         saver.writeBatch();
         // .arff file will be created in the output location
         return arffFile;
-    }
-
-    private static void randomForest(File folder) {
-        try {
-            Instances structure = new Instances(new FileReader(folder));
-            structure.setClassIndex(structure.numAttributes() - 1);
-            System.out.println("Loaded data from arff file...");
-
-            RandomForest randomForest = new RandomForest();
-            randomForest.setNumFeatures(32);
-
-            Evaluation eval = new Evaluation(structure);
-            eval.crossValidateModel(randomForest, structure, 10, new Random(1));
-            System.out.println("Estimated Accuracy: "+Double.toString(eval.pctCorrect()));
-
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

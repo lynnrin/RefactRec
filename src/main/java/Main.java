@@ -3,10 +3,9 @@ import java.io.File;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-//        args = new String[2];
-//        args[0] = "-c";
-//        args[1] = "/Users/lynn/java-exp/ant/ant";
-//        args[2] = "1";
+        args = new String[2];
+        args[0] = "-c";
+        args[1] = "/Users/lynn/jt/test/ant";
         if(args.length < 1){
             throw new IllegalArgumentException("Type 'RefactorRec -h' to show usage");
         }

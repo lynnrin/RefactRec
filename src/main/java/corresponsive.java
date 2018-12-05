@@ -4,23 +4,8 @@ import java.util.Scanner;
 
 public class corresponsive {
     public void corresponsive(File folder) throws IOException {
-        int x = 0;
-        Scanner scanner = new Scanner(System.in);
-        parameter pm = new parameter();
-        String[] refactoringType = pm.getRefactoringTypeList();
-        do {
-            try {
-                System.out.println("plz enter the integer according to the list below");
-                for (int i = 0; i < refactoringType.length; i++){
-                    System.out.println(i + " : " + refactoringType[i]);
-                }
-                x = scanner.nextInt();
-            } catch (InputMismatchException e) {
-                System.err.println("invalid input value");
-            }
-        }while (!(x >= 0 && x < refactoringType.length));
 
-        corresponsive(folder, x);
+        corresponsive(folder, select.selection());
     }
 
     public void corresponsive(File folder, int x) throws IOException {
@@ -29,12 +14,10 @@ public class corresponsive {
 
         switch (refactoringType[x]){
             case "Extract Method":
-                corresMethod(folder, "Extract Method");
-                corresMethod(folder, "Extract And Move Method");
+                corresMethod(folder, "Extract");
                 break;
             case "Move Method":
                 corresMethod(folder, "Move Method");
-                corresMethod(folder, "Extract And Move Method");
             case "Inline Method":
                 corresMethod(folder, "Inline Method");
             default:
@@ -98,7 +81,7 @@ public class corresponsive {
 
             while ((line = br.readLine()) != null) {
                 java.lang.String[] data = line.split(separate, 0);
-                if (data[0].length() == 40 && data[1].equals(type)) {
+                if (data[0].length() == 40 && data[1].matches(".*" + type + ".*")) {
                     File csvFile = new File(dataDir + "/" + data[0] + ".csv");
                     BufferedReader csvBr = new BufferedReader(new FileReader(csvFile));
 
