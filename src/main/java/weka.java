@@ -5,13 +5,12 @@ import weka.core.converters.CSVLoader;
 import java.io.File;
 
 public class weka {
-    public static void weka(File folder) throws Exception {
+    public static void weka(File folder, int sel) throws Exception{
         java.lang.String parentPath = folder.getParent();
         File dir = new File(parentPath);
         File[] files = dir.listFiles();
         parameter pm = new parameter();
         String[] refactoringType = pm.getRefactoringTypeList();
-        int sel =  select.selection();
         String targetFile;
         switch (refactoringType[sel]){
             case "Extract Method":
@@ -30,9 +29,15 @@ public class weka {
             File targetFolder = new File(targetFile);
 
             File arffFile = csv2arff(targetFolder, new File(targetFile));
+            runWeka.runWeka(arffFile.getPath());
+
         } catch (Exception e) {
             System.err.println("don't find target file");
         }
+    }
+    public static void weka(File folder) throws Exception {
+        int sel = select.selection();
+        weka(folder, sel);
     }
 
     private static String searchTargetFile(File[] files, String target){

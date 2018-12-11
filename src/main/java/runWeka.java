@@ -1,5 +1,7 @@
 import com.weka.ml.ModelClassifier;
 import com.weka.ml.ModelGenerator;
+import com.weka.ml.wekaRanker;
+import weka.attributeSelection.AttributeSelection;
 import weka.classifiers.evaluation.Evaluation;
 import weka.classifiers.functions.MultilayerPerceptron;
 import weka.classifiers.trees.RandomForest;
@@ -8,16 +10,18 @@ import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Normalize;
 
-public class Test {
+import java.util.Arrays;
+
+public class runWeka {
 
     public static final String DATASETPATH = "/Users/lynn/jt/test/ant_Extract.arff";
     public static final String MODElPATH = "/Users/lynn/jt/model.bin";
 
-    public static void main(String[] args) throws Exception {
+    public static void runWeka(String datasetPath) throws Exception {
 
         ModelGenerator mg = new ModelGenerator();
 
-        Instances dataset = mg.loadDataset(DATASETPATH);
+        Instances dataset = mg.loadDataset(datasetPath);
 
         Filter filter = new Normalize();
 
@@ -45,13 +49,15 @@ public class Test {
         System.out.println("precision about true\t" + eval.precision(1));
         System.out.println("recall about true\t" + eval.recall(1));
 
+        AttributeSelection ranker = wekaRanker.wekaRanker(dataset);
+        System.out.println("\noutput ranker");
+        for (double[] a : ranker.rankedAttributes()) {
+            System.out.println(Arrays.toString(a));
+        }
+        System.out.println("finished\n");
+
         //Save model
         mg.saveModel(rf, MODElPATH);
-
-        //classifiy a single instance
-//        ModelClassifier cls = new ModelClassifier();
-//        String classname =cls.classifiy(Filter.useFilter(cls.createInstance(1.6, 0.2, 0), filter), MODElPATH);
-//        System.out.println("\n The class name for the instance with petallength = 1.6 and petalwidth =0.2 is  " +classname);
 
     }
 
