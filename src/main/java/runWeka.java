@@ -1,15 +1,12 @@
-import com.weka.ml.ModelClassifier;
 import com.weka.ml.ModelGenerator;
-import com.weka.ml.wekaRanker;
-import weka.attributeSelection.AttributeSelection;
-import weka.attributeSelection.CfsSubsetEval;
-import weka.attributeSelection.GreedyStepwise;
+import weka.attributeSelection.*;
+import weka.classifiers.Classifier;
 import weka.classifiers.evaluation.Evaluation;
-import weka.classifiers.functions.MultilayerPerceptron;
 import weka.classifiers.meta.AttributeSelectedClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Debug;
 import weka.core.Instances;
+import weka.core.SerializationHelper;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Normalize;
 
@@ -19,7 +16,7 @@ import java.util.Random;
 public class runWeka {
 
     public static final String DATASETPATH = "/Users/lynn/jt/test/ant_Extract.arff";
-    public static final String MODElPATH = "/Users/lynn/jt/test/model.bin";
+    public static final String MODElPATH = "/Users/lynn/jt/test/rf.model";
 
     public static void runWeka(String datasetPath) throws Exception {
 
@@ -50,7 +47,10 @@ public class runWeka {
         eval.crossValidateModel(rf, datasetnor, 10, new Random(1));
         representation(eval);
 
-        AttributeSelection ranker = wekaRanker.wekaRanker(datasetnor);
+        //Save model
+        mg.saveModel(rf, MODElPATH);
+
+        AttributeSelection ranker = wekaRanker(datasetnor);
 
         System.out.println("\noutput ranker");
         for (double[] a : ranker.rankedAttributes()) {
@@ -70,18 +70,36 @@ public class runWeka {
         evaluation.crossValidateModel(classifier, datasetnor, 10, new Random(1));
         representation(evaluation);
 
-
-
-        //Save model
-        mg.saveModel(rf, MODElPATH);
+//        loadModel(datasetPath, MODElPATH);
 
     }
 
     private static void representation(Evaluation eval) {
-        System.out.println("Evaluation: " + eval.toSummaryString());
+        System.out.println("\nEvaluation: " + eval.toSummaryString());
         System.out.println("f-measure\t" + eval.fMeasure(1));
         System.out.println("precision about true\t" + eval.precision(1));
         System.out.println("recall about true\t" + eval.recall(1));
     }
 
+    private static AttributeSelection wekaRanker(Instances trainDataSet) throws Exception {
+        AttributeSelection selector = new AttributeSelection();
+        InfoGainAttributeEval eval = new InfoGainAttributeEval();
+        Ranker ranker = new Ranker();
+//        ranker.setNumToSelect(Math.min(500, trainDataSet.numAttributes() - 1));
+        selector.setEvaluator(eval);
+        selector.setSearch(ranker);
+        selector.SelectAttributes(trainDataSet);
+        return selector;
+    }
+
+    public static void loadModel(String datasetPath, String modelPath) throws Exception {
+        Classifier cls = (Classifier) SerializationHelper.read(modelPath);
+        ModelGenerator mg = new ModelGenerator();
+        Instances dataset = mg.loadDataset(datasetPath);
+        cls.buildClassifier(dataset);
+        Evaluation eval = new Evaluation(dataset);
+        eval.crossValidateModel(cls, dataset, 10, new Random(1));
+        System.out.println("\noutput result about load model");
+        representation(eval);
+    }
 }
