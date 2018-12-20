@@ -18,8 +18,10 @@ public class corresponsive {
                 break;
             case "Move Method":
                 corresMethod(folder, "Move Method");
+                break;
             case "Inline Method":
                 corresMethod(folder, "Inline Method");
+                break;
             default:
                 corresMethod(folder, "Extract Method");
         }

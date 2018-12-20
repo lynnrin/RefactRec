@@ -3,10 +3,10 @@ import java.io.File;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        args = new String[3];
-        args[0] = "-w";
-        args[1] = "/Users/lynn/jt/test/ant";
-        args[2] = "0";
+//        args = new String[3];
+//        args[0] = "-w";
+//        args[1] = "/Users/lynn/jt/test/ant";
+//        args[2] = "0";
         if(args.length < 1){
             throw new IllegalArgumentException("Type 'RefactorRec -h' to show usage");
         }
@@ -24,9 +24,12 @@ public class Main {
             fromCorresponsive(args);
         } else if (option.equalsIgnoreCase("-w")){
             fromWeka(args);
+        } else if (option.equalsIgnoreCase("-ex")) {
+            compareModel.compareModel(args[1], args[2]);
         } else {
             printTips();
         }
+        System.out.println("finished\n\n\n\n\n");
     }
 
     private static void fromGetRefactor(String[] args) throws Exception {
@@ -44,7 +47,7 @@ public class Main {
     private static void fromParseXML(String[] args) throws Exception {
         System.out.println("start with parse XML files.");
         parseXML.parseXML(new File(args[1]));
-        fromCorresponsive(args);
+//        fromCorresponsive(args);
     }
 
     private static void fromCorresponsive(String[] args) throws Exception {

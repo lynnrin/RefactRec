@@ -14,13 +14,16 @@ public class weka {
         String targetFile;
         switch (refactoringType[sel]){
             case "Extract Method":
+                System.out.println("Extract Method===============");
                 targetFile = searchTargetFile(files, "Extract");
                 break;
             case "Move Method":
                 targetFile = searchTargetFile(files, "Move");
+                System.out.println("Move Method===============");
                 break;
             case "Inline Method":
                 targetFile = searchTargetFile(files, "Inline");
+                System.out.println("Inline Method===============");
                 break;
             default:
                 targetFile = searchTargetFile(files, "Extract");
@@ -28,7 +31,7 @@ public class weka {
         try {
             File targetFolder = new File(targetFile);
 
-            File arffFile = csv2arff(targetFolder, new File(targetFile));
+            File arffFile = csv2arff(new File(targetFile));
             runWeka.runWeka(arffFile.getPath());
 
         } catch (Exception e) {
@@ -49,10 +52,10 @@ public class weka {
         return null;
     }
 
-    private static File csv2arff(File folder, File target) throws Exception {
+    private static File csv2arff(File target) throws Exception {
         // load CSV
         CSVLoader loader = new CSVLoader();
-        loader.setSource(folder);
+        loader.setSource(target);
         Instances data = loader.getDataSet();
         // save ARFF
         ArffSaver saver = new ArffSaver();
