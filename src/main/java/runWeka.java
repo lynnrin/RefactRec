@@ -91,8 +91,10 @@ public class runWeka {
         System.out.println("\n\n\noutput ranker");
         buf.append("\n\n\noutput ranker");
         for (double[] a : ranker.rankedAttributes()) {
+            buf.append("\n" + Arrays.toString(a));
             System.out.println(Arrays.toString(a));
         }
+        buf.append("\n\n\n");
         System.out.println("\n\n\n");
 
         AttributeSelectedClassifier classifier = new AttributeSelectedClassifier();
@@ -119,6 +121,9 @@ public class runWeka {
 
     static void representation(Evaluation eval) {
         System.out.println("\nEvaluation: " + eval.toSummaryString());
+        System.out.println("f-measure\t" + eval.fMeasure(0));
+        System.out.println("precision about true\t" + eval.precision(0));
+        System.out.println("recall about true\t" + eval.recall(0));
         System.out.println("f-measure\t" + eval.fMeasure(1));
         System.out.println("precision about true\t" + eval.precision(1));
         System.out.println("recall about true\t" + eval.recall(1));
@@ -127,6 +132,9 @@ public class runWeka {
     static String bufRepresentation(Evaluation eval) {
         StringBuilder buf = new StringBuilder();
         buf.append("\nEvaluation: " + eval.toSummaryString());
+        buf.append("\nf-measure\t" + eval.fMeasure(0));
+        buf.append("\nprecision about true\t" + eval.precision(0));
+        buf.append("\nrecall about true\t" + eval.recall(0));
         buf.append("\nf-measure\t" + eval.fMeasure(1));
         buf.append("\nprecision about true\t" + eval.precision(1));
         buf.append("\nrecall about true\t" + eval.recall(1));

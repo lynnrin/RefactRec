@@ -5,21 +5,23 @@ import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Normalize;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 
 public class compareModel {
     static void compareModel(String datasetPath, String testDataPath) throws Exception {
         File data = new File(datasetPath);
         File testData = new File(testDataPath);
-        ModelGenerator mg = new ModelGenerator();
-        Instances dataset = mg.loadDataset(datasetPath);
+        Instances dataset = new Instances(new BufferedReader((new FileReader(datasetPath))));
+        dataset.setClassIndex(dataset.numAttributes()-1);
+        Instances testset = new Instances(new BufferedReader((new FileReader(testDataPath))));
+        testset.setClassIndex(testset.numAttributes()-1);
         Filter filter = new Normalize();
 
         //Normalize dataset
         filter.setInputFormat(dataset);
         Instances datasetnor = Filter.useFilter(dataset, filter);
-
-        Instances testdataset = new Instances(new Instances(mg.loadDataset(testDataPath)));
 
         // build classifier with train dataset
         System.out.println("model: " + data.getName() + "\noutput random forest model");
@@ -27,7 +29,8 @@ public class compareModel {
         RandomForest rf = new RandomForest();
         rf.buildClassifier(datasetnor);
         // Evaluate classifier with test dataset
-        Evaluation eval = mg.evaluateModel(rf, datasetnor, testdataset);
+        Evaluation eval = new Evaluation(datasetnor);
+        eval.evaluateModel(rf, testset);
         runWeka.representation(eval);
     }
 }
