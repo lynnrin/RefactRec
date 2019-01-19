@@ -7,10 +7,9 @@ import weka.classifiers.functions.MultilayerPerceptron;
 import weka.classifiers.functions.SMO;
 import weka.classifiers.meta.AttributeSelectedClassifier;
 import weka.classifiers.trees.RandomForest;
-import weka.core.Debug;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
-import weka.filters.Filter;
+import weka.filters.*;
 import weka.filters.unsupervised.attribute.Normalize;
 
 import java.io.File;
@@ -23,70 +22,71 @@ public class runWeka {
     public static final String DATASETPATH = "/Users/lynn/jt/test/ant_Extract.arff";
     public static final String MODElPATH = "/Users/lynn/jt/test/rf.model";
 
+
     public static void runWeka(String datasetPath) throws Exception {
         File data = new File(datasetPath);
         String modelPath = data.getPath().replaceFirst("\\.arff", "\\.model");
         String txtPath = data.getPath().replaceFirst("\\.arff", "\\.txt");
-        FileWriter writer = new FileWriter(new File(txtPath));
         StringBuilder buf = new StringBuilder();
+        FileWriter writer = new FileWriter(new File(txtPath));
 
         ModelGenerator mg = new ModelGenerator();
         Instances dataset = mg.loadDataset(datasetPath);
+
+        //Normalize
         Filter filter = new Normalize();
-
-        // divide dataset to train dataset 80% and test dataset 20%
-        int trainSize = (int) Math.round(dataset.numInstances() * 0.8);
-        int testSize = dataset.numInstances() - trainSize;
-
-        dataset.randomize(new Debug.Random(1));// if you comment this line the accuracy of the model will be droped from 96.6% to 80%
-
-        //Normalize dataset
         filter.setInputFormat(dataset);
         Instances datasetnor = Filter.useFilter(dataset, filter);
 
-        Instances traindataset = new Instances(datasetnor, 0, trainSize);
-        Instances testdataset = new Instances(datasetnor, trainSize, testSize);
+        //SelectAttributes
+        Instances RelData = AttSelRel(datasetnor);
+        Instances WrapData = AttSelWrap(datasetnor);
+        buf = evaluateML(data, RelData, mg, buf, "ReliefF");
+        buf = evaluateML(data, WrapData, mg, buf, "Wrapeer");
 
-        // build classifier with train dataset
-        System.out.println(data.getName() + "\noutput random forest model");
-        buf.append(data.getName() + "\noutput random forest model");
-        RandomForest rf = new RandomForest();
-        rf.buildClassifier(datasetnor);
-        // Evaluate classifier with test dataset
-        Evaluation eval = mg.evaluateModel(rf, traindataset, testdataset);
-//        Evaluation eval = new Evaluation(datasetnor);
-//        eval.crossValidateModel(rf, datasetnor, 10, new Random(1));
-        buf.append(bufRepresentation(eval));
-        representation(eval);
+        buf = evaluateRanking(data, datasetnor, buf);
 
-        //Save model
-        mg.saveModel(rf, modelPath);
+        writer.write(buf.toString());
+        writer.close();
 
-        System.out.println("\n\n\n" + data.getName() + "\noutput Multi layer perceptron");
-        buf.append("\n\n\n" + data.getName() + "\noutput Multi layer perceptron");
-        MultilayerPerceptron multi = new MultilayerPerceptron();
-        multi.buildClassifier(datasetnor);
-        eval = mg.evaluateModel(multi, traindataset, testdataset);
-        buf.append(bufRepresentation(eval));
-        representation(eval);
+    }
 
-        System.out.println("\n\n\n" + data.getName() + "\noutput bayes net");
-        buf.append("\n\n\n" + data.getName() + "\noutput bayes net");
-        BayesNet bayes = new BayesNet();
-        bayes.buildClassifier(datasetnor);
-        eval = mg.evaluateModel(bayes, traindataset, testdataset);
-        buf.append(bufRepresentation(eval));
-        representation(eval);
+    private static Instances AttSelRel(Instances dataset) {
+        AttributeSelection filter = new AttributeSelection();
+        try {
+            Ranker search = new Ranker();
+            ReliefFAttributeEval eval = new ReliefFAttributeEval();
+            filter.setEvaluator(eval);
+            filter.setSearch(search);
+            filter.SelectAttributes(dataset);
+            Instances newData = filter.reduceDimensionality(dataset);
+            return newData;
 
-        System.out.println("\n\n\n" + data.getName() + "\noutput SMO(SVM)");
-        buf.append("\n\n\n" + data.getName() + "\noutput SMO(SVM)");
-        SMO smo = new SMO();
-        smo.buildClassifier(datasetnor);
-        eval = mg.evaluateModel(smo, traindataset,testdataset);
-        buf.append(bufRepresentation(eval));
-        representation(eval);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return dataset;
+    }
 
-        AttributeSelection ranker = wekaRanker(datasetnor);
+    private static Instances AttSelWrap(Instances dataset) {
+        AttributeSelection filter = new AttributeSelection();
+        try {
+            Ranker search = new Ranker();
+            WrapperSubsetEval eval = new WrapperSubsetEval();
+            filter.setEvaluator(eval);
+            filter.setSearch(search);
+            filter.SelectAttributes(dataset);
+            Instances newData = filter.reduceDimensionality(dataset);
+            return newData;
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return dataset;
+    }
+
+    private static StringBuilder evaluateRanking(File data, Instances dataset, StringBuilder buf) throws Exception {
+        AttributeSelection ranker = wekaRanker(dataset);
 
         System.out.println("\n\n\noutput ranker");
         buf.append("\n\n\noutput ranker");
@@ -100,23 +100,64 @@ public class runWeka {
         AttributeSelectedClassifier classifier = new AttributeSelectedClassifier();
         CfsSubsetEval ev = new CfsSubsetEval();
         GreedyStepwise search = new GreedyStepwise();
+        RandomForest rf = new RandomForest();
+        rf.buildClassifier(dataset);
         search.setSearchBackwards(true);
         classifier.setClassifier(rf);
         classifier.setEvaluator(ev);
         classifier.setSearch(search);
         // 10-fold cross-validation
-        Evaluation evaluation = new Evaluation(datasetnor);
-        evaluation.crossValidateModel(classifier, datasetnor, 10, new Random(1));
+        Evaluation evaluation = new Evaluation(dataset);
+        evaluation.crossValidateModel(classifier, dataset, 10, new Random(1));
         System.out.println(data.getName() + "\nattributed selectioned");
         buf.append("\n" + data.getName() + "\nattributed selectioned");
         representation(evaluation);
+        buf.append(bufRepresentation(evaluation));
+
+        return buf;
+    }
+
+    private static StringBuilder evaluateML(File data, Instances dataset, ModelGenerator mg, StringBuilder buf, String type) throws Exception {
+        int trainSize = (int) Math.round(dataset.numInstances() * 0.8);
+        int testSize = dataset.numInstances() - trainSize;
+
+        Instances traindataset = new Instances(dataset, 0, trainSize);
+        Instances testdataset = new Instances(dataset, trainSize, testSize);
+
+        // build classifier with train dataset
+        System.out.println(data.getName() + "\noutput random forest model with " + type);
+        buf.append(data.getName() + "\noutput random forest model");
+        RandomForest rf = new RandomForest();
+        rf.buildClassifier(dataset);
+        Evaluation eval = mg.evaluateModel(rf, traindataset, testdataset);
         buf.append(bufRepresentation(eval));
+        representation(eval);
 
-        writer.write(buf.toString());
-        writer.close();
+        System.out.println("\n\n\n" + data.getName() + "\noutput Multi layer perceptron with " + type);
+        buf.append("\n\n\n" + data.getName() + "\noutput Multi layer perceptron");
+        MultilayerPerceptron multi = new MultilayerPerceptron();
+        multi.buildClassifier(dataset);
+        eval = mg.evaluateModel(multi, traindataset, testdataset);
+        buf.append(bufRepresentation(eval));
+        representation(eval);
 
-//        loadModel(datasetPath, MODElPATH);
+        System.out.println("\n\n\n" + data.getName() + "\noutput bayes net with " + type);
+        buf.append("\n\n\n" + data.getName() + "\noutput bayes net");
+        BayesNet bayes = new BayesNet();
+        bayes.buildClassifier(dataset);
+        eval = mg.evaluateModel(bayes, traindataset, testdataset);
+        buf.append(bufRepresentation(eval));
+        representation(eval);
 
+        System.out.println("\n\n\n" + data.getName() + "\noutput SMO(SVM) with " + type);
+        buf.append("\n\n\n" + data.getName() + "\noutput SMO(SVM)");
+        SMO smo = new SMO();
+        smo.buildClassifier(dataset);
+        eval = mg.evaluateModel(smo, traindataset,testdataset);
+        buf.append(bufRepresentation(eval));
+        representation(eval);
+
+        return buf;
     }
 
     static void representation(Evaluation eval) {
@@ -145,7 +186,6 @@ public class runWeka {
         AttributeSelection selector = new AttributeSelection();
         InfoGainAttributeEval eval = new InfoGainAttributeEval();
         Ranker ranker = new Ranker();
-//        ranker.setNumToSelect(Math.min(500, trainDataSet.numAttributes() - 1));
         selector.setEvaluator(eval);
         selector.setSearch(ranker);
         selector.SelectAttributes(trainDataSet);
