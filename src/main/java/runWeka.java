@@ -9,7 +9,8 @@ import weka.classifiers.meta.AttributeSelectedClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
-import weka.filters.*;
+import weka.filters.Filter;
+import weka.filters.supervised.instance.SMOTE;
 import weka.filters.unsupervised.attribute.Normalize;
 
 import java.io.File;
@@ -33,6 +34,9 @@ public class runWeka {
         ModelGenerator mg = new ModelGenerator();
         Instances dataset = mg.loadDataset(datasetPath);
 
+        //over sampling
+        dataset = overSampling(dataset);
+
         //Normalize
         Filter filter = new Normalize();
         filter.setInputFormat(dataset);
@@ -49,6 +53,18 @@ public class runWeka {
         writer.write(buf.toString());
         writer.close();
 
+    }
+
+    private static Instances overSampling(Instances dataset) {
+        SMOTE filter = new SMOTE();
+        Instances newDataSet = dataset;
+        try {
+            filter.setInputFormat(dataset);
+            newDataSet = Filter.useFilter(dataset, filter);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return newDataSet;
     }
 
     private static Instances AttSelRel(Instances dataset) {

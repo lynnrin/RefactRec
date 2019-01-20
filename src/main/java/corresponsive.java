@@ -106,9 +106,9 @@ public class corresponsive {
                                 p.print(sepOutput);
                             }
                             if (methodName.equals(csvData[2].substring(0, csvData[2].indexOf("("))) && refCount == dataCount){
-                                p.print("true"); // if it is target, output 1
+                                p.print("0"); // if it is target, output 0
                             } else {
-                                p.print("false");
+                                p.print("1");
                             }
                             p.println();
                             //********
