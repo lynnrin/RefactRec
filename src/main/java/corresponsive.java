@@ -14,7 +14,7 @@ public class corresponsive {
 
         switch (refactoringType[x]){
             case "Extract Method":
-                corresMethod(folder, "Extract");
+                corresMethod(folder, "Extract Method");
                 break;
             case "Move Method":
                 corresMethod(folder, "Move Method");

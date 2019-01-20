@@ -71,7 +71,7 @@ public class runWeka {
     private static Instances AttSelWrap(Instances dataset) {
         AttributeSelection filter = new AttributeSelection();
         try {
-            Ranker search = new Ranker();
+            BestFirst search = new BestFirst();
             WrapperSubsetEval eval = new WrapperSubsetEval();
             filter.setEvaluator(eval);
             filter.setSearch(search);
